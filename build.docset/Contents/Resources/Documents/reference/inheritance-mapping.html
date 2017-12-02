@@ -1,0 +1,416 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Inheritance Mapping &mdash; Doctrine MongoDB ODM 1.1.5 documentation</title>
+    <link rel="stylesheet" href="../_static/bootstrap/css/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/layout.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/configurationblock.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.1.5',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/configurationblock.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/configurationblock.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/configurationblock.js"></script>
+    <script src="../_static/bootstrap/js/bootstrap.min.js"></script>
+
+    <script type="text/javascript">
+    <!--
+        $(document).ready(function() {
+            $("#versions").change(function() {
+                var docsUrl = $(this).val();
+                window.location.href = docsUrl;
+            });
+        });
+    -->
+    </script>
+    <link rel="shortcut icon" href="../_static/doctrine.ico"/>
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="top" title="Doctrine MongoDB ODM 1.1.5 documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div id="wrapper">
+      <div id="header">
+        <h1 id="h1title"></h1>
+        <div id="logo">
+          <a href="http://www.doctrine-project.org/">Doctrine - PHP Database Libraries</a>
+        </div>
+      </div>
+      <div id="nav" class="cls">
+        <div class="tl cls">
+          <ul>
+            <li><a target="_top" href="http://www.doctrine-project.org/">Home</a></li>
+            <li><a target="_top" href="http://www.doctrine-project.org/about.html">About</a></li>
+            <li><a target="_top" href="http://www.doctrine-project.org/projects.html">Projects</a></li>
+            <li><a target="_top" href="http://www.doctrine-project.org/contribute.html">Contribute</a></li>
+            <li><a target="_top" href="http://www.doctrine-project.org/community.html">Community</a></li>
+            <li><a target="_top" href="http://www.doctrine-project.org/archive.html">Blog</a></li>
+            <li><a target="_top" href="http://www.doctrine-project.org/jira">Development</a></li>
+          </ul>
+        </div>
+      </div>
+      <div id="content" class="cls">
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li><a href="/">Doctrine Homepage</a> &raquo;</li>
+        <li><a href="../index.html">Doctrine MongoDB ODM 1.1.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+        <div class="document">
+            <div class="documentwrapper">
+                <div class="bodywrapper">
+
+              <div class="body" >
+                
+  <div class="section" id="inheritance-mapping">
+<span id="id1"></span><h1>Inheritance Mapping<a class="headerlink" href="#inheritance-mapping" title="Permalink to this headline">¶</a></h1>
+<p>Doctrine currently offers two supported methods of inheritance:
+<a class="reference internal" href="#single-collection-inheritance"><span class="std std-ref">single collection</span></a> and
+<a class="reference internal" href="#collection-per-class-inheritance"><span class="std std-ref">collection per class</span></a> inheritance.</p>
+<div class="section" id="mapped-superclasses">
+<h2>Mapped Superclasses<a class="headerlink" href="#mapped-superclasses" title="Permalink to this headline">¶</a></h2>
+<p>A mapped superclass is an abstract or concrete class that provides mapping
+information for its subclasses, but is not itself a document. Typically, the
+purpose of such a mapped superclass is to define state and mapping information
+that is common to multiple document classes.</p>
+<p>Just like non-mapped classes, mapped superclasses may appear in the middle of
+an otherwise mapped inheritance hierarchy (through
+<a class="reference internal" href="#single-collection-inheritance"><span class="std std-ref">single collection</span></a> or
+<a class="reference internal" href="#collection-per-class-inheritance"><span class="std std-ref">collection per class</span></a>) inheritance.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">A mapped superclass cannot be a document and is not queryable.</p>
+</div>
+<p>Example:</p>
+<div class="configuration-block">
+<ul class="simple">
+<li><em>PHP</em><div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">namespace</span> <span class="nx">Documents</span><span class="p">;</span>
+
+<span class="sd">/** @MappedSuperclass */</span>
+<span class="k">abstract</span> <span class="k">class</span> <span class="nc">BaseDocument</span>
+<span class="p">{</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><em>XML</em><div class="highlight-xml"><div class="highlight"><pre><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+<span class="nt">&lt;doctrine-mongo-mapping</span> <span class="na">xmlns=</span><span class="s">&quot;http://doctrine-project.org/schemas/odm/doctrine-mongo-mapping&quot;</span>
+                <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+                <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://doctrine-project.org/schemas/odm/doctrine-mongo-mapping</span>
+<span class="s">                http://doctrine-project.org/schemas/odm/doctrine-mongo-mapping.xsd&quot;</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;mapped-superclass</span> <span class="na">name=</span><span class="s">&quot;Documents\BaseDocument&quot;</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;/mapped-superclass&gt;</span>
+<span class="nt">&lt;/doctrine-mongo-mapping&gt;</span>
+</pre></div>
+</div>
+</li>
+<li><em>YAML</em><div class="highlight-yaml"><div class="highlight"><pre><span class="l l-Scalar l-Scalar-Plain">Documents\BaseDocument</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">mappedSuperclass</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="single-collection-inheritance">
+<span id="id2"></span><h2>Single Collection Inheritance<a class="headerlink" href="#single-collection-inheritance" title="Permalink to this headline">¶</a></h2>
+<p>In single collection inheritance, each document is stored in a single collection
+and a discriminator field is used to distinguish one document type from another.</p>
+<p>Simple example:</p>
+<div class="configuration-block">
+<ul class="simple">
+<li><em>PHP</em><div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">namespace</span> <span class="nx">Documents</span><span class="p">;</span>
+
+<span class="sd">/**</span>
+<span class="sd"> * @Document</span>
+<span class="sd"> * @InheritanceType(&quot;SINGLE_COLLECTION&quot;)</span>
+<span class="sd"> * @DiscriminatorField(&quot;type&quot;)</span>
+<span class="sd"> * @DiscriminatorMap({&quot;person&quot;=&quot;Person&quot;, &quot;employee&quot;=&quot;Employee&quot;})</span>
+<span class="sd"> */</span>
+<span class="k">class</span> <span class="nc">Person</span>
+<span class="p">{</span>
+    <span class="c1">// ...</span>
+<span class="p">}</span>
+
+<span class="sd">/**</span>
+<span class="sd"> * @Document</span>
+<span class="sd"> */</span>
+<span class="k">class</span> <span class="nc">Employee</span> <span class="k">extends</span> <span class="nx">Person</span>
+<span class="p">{</span>
+    <span class="c1">// ...</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><em>XML</em><div class="highlight-xml"><div class="highlight"><pre><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+<span class="nt">&lt;doctrine-mongo-mapping</span> <span class="na">xmlns=</span><span class="s">&quot;http://doctrine-project.org/schemas/odm/doctrine-mongo-mapping&quot;</span>
+                <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+                <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://doctrine-project.org/schemas/odm/doctrine-mongo-mapping</span>
+<span class="s">                http://doctrine-project.org/schemas/odm/doctrine-mongo-mapping.xsd&quot;</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;document</span> <span class="na">name=</span><span class="s">&quot;Documents\Person&quot;</span> <span class="na">inheritance-type=</span><span class="s">&quot;SINGLE_COLLECTION&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;discriminator-field</span> <span class="na">name=</span><span class="s">&quot;type&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;discriminator-map&gt;</span>
+        <span class="nt">&lt;discriminator-mapping</span> <span class="na">value=</span><span class="s">&quot;person&quot;</span> <span class="na">class=</span><span class="s">&quot;Person&quot;</span> <span class="nt">/&gt;</span>
+        <span class="nt">&lt;discriminator-mapping</span> <span class="na">value=</span><span class="s">&quot;employee&quot;</span> <span class="na">class=</span><span class="s">&quot;Employee&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;/discriminator-map&gt;</span>
+  <span class="nt">&lt;/document&gt;</span>
+<span class="nt">&lt;/doctrine-mongo-mapping&gt;</span>
+
+<span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+<span class="nt">&lt;doctrine-mongo-mapping</span> <span class="na">xmlns=</span><span class="s">&quot;http://doctrine-project.org/schemas/odm/doctrine-mongo-mapping&quot;</span>
+                <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+                <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://doctrine-project.org/schemas/odm/doctrine-mongo-mapping</span>
+<span class="s">                http://doctrine-project.org/schemas/odm/doctrine-mongo-mapping.xsd&quot;</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;document</span> <span class="na">name=</span><span class="s">&quot;Documents\Employee&quot;</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;/document&gt;</span>
+<span class="nt">&lt;/doctrine-mongo-mapping&gt;</span>
+</pre></div>
+</div>
+</li>
+<li><em>YAML</em><div class="highlight-yaml"><div class="highlight"><pre><span class="l l-Scalar l-Scalar-Plain">Documents\Person</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">document</span>
+  <span class="l l-Scalar l-Scalar-Plain">inheritanceType</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">SINGLE_COLLECTION</span>
+  <span class="l l-Scalar l-Scalar-Plain">discriminatorField</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">type</span>
+  <span class="l l-Scalar l-Scalar-Plain">discriminatorMap</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">person</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">Person</span>
+    <span class="l l-Scalar l-Scalar-Plain">employee</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">Employee</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<p>The discriminator value allows Doctrine to infer the class name to instantiate
+when hydrating a document. If a discriminator map is used, the discriminator
+value will be used to look up the class name in the map.</p>
+<p>Now, if we query for a Person and its discriminator value is <code class="docutils literal"><span class="pre">employee</span></code>, we
+would get an Employee instance back:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="nv">$employee</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Employee</span><span class="p">();</span>
+<span class="c1">// ...</span>
+<span class="nv">$dm</span><span class="o">-&gt;</span><span class="na">persist</span><span class="p">(</span><span class="nv">$employee</span><span class="p">);</span>
+<span class="nv">$dm</span><span class="o">-&gt;</span><span class="na">flush</span><span class="p">();</span>
+
+<span class="nv">$employee</span> <span class="o">=</span> <span class="nv">$dm</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="s1">&#39;Person&#39;</span><span class="p">,</span> <span class="nv">$employee</span><span class="o">-&gt;</span><span class="na">getId</span><span class="p">());</span> <span class="c1">// instanceof Employee</span>
+</pre></div>
+</div>
+<p>Even though we queried for a Person, Doctrine will know to return an Employee
+instance because of the discriminator map!</p>
+<p>If your document structure has changed and you've added discriminators after
+already having a bunch of documents, you can specify a default value for the
+discriminator field:</p>
+<div class="configuration-block">
+<ul class="simple">
+<li><em>PHP</em><div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">namespace</span> <span class="nx">Documents</span><span class="p">;</span>
+
+<span class="sd">/**</span>
+<span class="sd"> * @Document</span>
+<span class="sd"> * @InheritanceType(&quot;SINGLE_COLLECTION&quot;)</span>
+<span class="sd"> * @DiscriminatorField(&quot;type&quot;)</span>
+<span class="sd"> * @DiscriminatorMap({&quot;person&quot;=&quot;Person&quot;, &quot;employee&quot;=&quot;Employee&quot;})</span>
+<span class="sd"> * @DefaultDiscriminatorValue(&quot;person&quot;)</span>
+<span class="sd"> */</span>
+<span class="k">class</span> <span class="nc">Person</span>
+<span class="p">{</span>
+    <span class="c1">// ...</span>
+<span class="p">}</span>
+
+<span class="sd">/**</span>
+<span class="sd"> * @Document</span>
+<span class="sd"> */</span>
+<span class="k">class</span> <span class="nc">Employee</span> <span class="k">extends</span> <span class="nx">Person</span>
+<span class="p">{</span>
+    <span class="c1">// ...</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><em>XML</em><div class="highlight-xml"><div class="highlight"><pre><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+<span class="nt">&lt;doctrine-mongo-mapping</span> <span class="na">xmlns=</span><span class="s">&quot;http://doctrine-project.org/schemas/odm/doctrine-mongo-mapping&quot;</span>
+                <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+                <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://doctrine-project.org/schemas/odm/doctrine-mongo-mapping</span>
+<span class="s">                http://doctrine-project.org/schemas/odm/doctrine-mongo-mapping.xsd&quot;</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;document</span> <span class="na">name=</span><span class="s">&quot;Documents\Person&quot;</span> <span class="na">inheritance-type=</span><span class="s">&quot;SINGLE_COLLECTION&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;discriminator-field</span> <span class="na">name=</span><span class="s">&quot;type&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;discriminator-map&gt;</span>
+        <span class="nt">&lt;discriminator-mapping</span> <span class="na">value=</span><span class="s">&quot;person&quot;</span> <span class="na">class=</span><span class="s">&quot;Person&quot;</span> <span class="nt">/&gt;</span>
+        <span class="nt">&lt;discriminator-mapping</span> <span class="na">value=</span><span class="s">&quot;employee&quot;</span> <span class="na">class=</span><span class="s">&quot;Employee&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;/discriminator-map&gt;</span>
+    <span class="nt">&lt;default-discriminator-value</span> <span class="na">value=</span><span class="s">&quot;person&quot;</span> <span class="nt">/&gt;</span>
+  <span class="nt">&lt;/document&gt;</span>
+<span class="nt">&lt;/doctrine-mongo-mapping&gt;</span>
+
+<span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+<span class="nt">&lt;doctrine-mongo-mapping</span> <span class="na">xmlns=</span><span class="s">&quot;http://doctrine-project.org/schemas/odm/doctrine-mongo-mapping&quot;</span>
+                <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+                <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://doctrine-project.org/schemas/odm/doctrine-mongo-mapping</span>
+<span class="s">                http://doctrine-project.org/schemas/odm/doctrine-mongo-mapping.xsd&quot;</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;document</span> <span class="na">name=</span><span class="s">&quot;Documents\Employee&quot;</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;/document&gt;</span>
+<span class="nt">&lt;/doctrine-mongo-mapping&gt;</span>
+</pre></div>
+</div>
+</li>
+<li><em>YAML</em><div class="highlight-yaml"><div class="highlight"><pre><span class="l l-Scalar l-Scalar-Plain">Documents\Person</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">document</span>
+  <span class="l l-Scalar l-Scalar-Plain">inheritanceType</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">SINGLE_COLLECTION</span>
+  <span class="l l-Scalar l-Scalar-Plain">discriminatorField</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">type</span>
+  <span class="l l-Scalar l-Scalar-Plain">defaultDiscriminatorValue</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">person</span>
+  <span class="l l-Scalar l-Scalar-Plain">discriminatorMap</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">person</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">Person</span>
+    <span class="l l-Scalar l-Scalar-Plain">employee</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">Employee</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="collection-per-class-inheritance">
+<span id="id3"></span><h2>Collection Per Class Inheritance<a class="headerlink" href="#collection-per-class-inheritance" title="Permalink to this headline">¶</a></h2>
+<p>With collection per class inheritance, each document is stored in its own
+collection and contains all inherited fields:</p>
+<div class="configuration-block">
+<ul class="simple">
+<li><em>PHP</em><div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">namespace</span> <span class="nx">Documents</span><span class="p">;</span>
+
+<span class="sd">/**</span>
+<span class="sd"> * @Document</span>
+<span class="sd"> * @InheritanceType(&quot;COLLECTION_PER_CLASS&quot;)</span>
+<span class="sd"> */</span>
+<span class="k">class</span> <span class="nc">Person</span>
+<span class="p">{</span>
+    <span class="c1">// ...</span>
+<span class="p">}</span>
+
+<span class="sd">/**</span>
+<span class="sd"> * @Document</span>
+<span class="sd"> */</span>
+<span class="k">class</span> <span class="nc">Employee</span> <span class="k">extends</span> <span class="nx">Person</span>
+<span class="p">{</span>
+    <span class="c1">// ...</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><em>XML</em><div class="highlight-xml"><div class="highlight"><pre><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+<span class="nt">&lt;doctrine-mongo-mapping</span> <span class="na">xmlns=</span><span class="s">&quot;http://doctrine-project.org/schemas/odm/doctrine-mongo-mapping&quot;</span>
+                <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+                <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://doctrine-project.org/schemas/odm/doctrine-mongo-mapping</span>
+<span class="s">                http://doctrine-project.org/schemas/odm/doctrine-mongo-mapping.xsd&quot;</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;document</span> <span class="na">name=</span><span class="s">&quot;Documents\Person&quot;</span> <span class="na">inheritance-type=</span><span class="s">&quot;COLLECTION_PER_CLASS&quot;</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;/document&gt;</span>
+<span class="nt">&lt;/doctrine-mongo-mapping&gt;</span>
+
+<span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+<span class="nt">&lt;doctrine-mongo-mapping</span> <span class="na">xmlns=</span><span class="s">&quot;http://doctrine-project.org/schemas/odm/doctrine-mongo-mapping&quot;</span>
+                <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+                <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://doctrine-project.org/schemas/odm/doctrine-mongo-mapping</span>
+<span class="s">                http://doctrine-project.org/schemas/odm/doctrine-mongo-mapping.xsd&quot;</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;document</span> <span class="na">name=</span><span class="s">&quot;Documents\Employee&quot;</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;/document&gt;</span>
+<span class="nt">&lt;/doctrine-mongo-mapping&gt;</span>
+</pre></div>
+</div>
+</li>
+<li><em>YAML</em><div class="highlight-yaml"><div class="highlight"><pre><span class="l l-Scalar l-Scalar-Plain">Documents\Person</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">document</span>
+  <span class="l l-Scalar l-Scalar-Plain">inheritanceType</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">COLLECTION_PER_CLASS</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<p>A discriminator is not needed with this type of inheritance since the data is
+separated in different collections.</p>
+</div>
+</div>
+
+
+              </div>
+                </div>
+
+            </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+             
+            <div id="searchbox" style="">
+              <h3>Search</h3>
+                <form class="search" action="http://readthedocs.org/search/project/" method="get">
+                  <input type="text" name="q" size="18">
+                  <input type="submit" value="Go">
+                  <input type="hidden" name="selected_facets" value="project:">
+                </form>
+            </div>
+            <h3><a href="../index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference internal" href="#">Inheritance Mapping</a><ul>
+<li><a class="reference internal" href="#mapped-superclasses">Mapped Superclasses</a></li>
+<li><a class="reference internal" href="#single-collection-inheritance">Single Collection Inheritance</a></li>
+<li><a class="reference internal" href="#collection-per-class-inheritance">Collection Per Class Inheritance</a></li>
+</ul>
+</li>
+</ul>
+
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../_sources/reference/inheritance-mapping.rst.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+        </div>
+      </div>
+          <div class="clearer"></div>
+        </div>
+          <div class="footer">
+              &copy; Copyright 2013, Doctrine Project Team.
+              Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.6.2.
+            <br/>
+            <a target="_BLANK" href="http://www.servergrove.com"><img src="http://www.doctrine-project.org/_static/servergrove.jpg" /></a>      <br/><br/>
+            <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+              <input type="hidden" name="cmd" value="_s-xclick" />
+              <input type="hidden" name="hosted_button_id" value="BAE2E3XANQ77Y" />
+              <input type="image" src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!" />
+              <img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1" />
+            </form>
+          </div>
+      </div>
+
+      <div id="bot-rcnr">
+        <div class="tl"><!-- corner --></div>
+      </div>
+    </div>
+
+  <script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+  </script>
+  <script type="text/javascript">
+  _uacct = "UA-288343-7";
+  urchinTracker();
+  </script>
+  <a class="githublink" href="http://github.com/doctrine"><img src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png" alt="Fork me on GitHub"></a>
+  </body>
+</html>

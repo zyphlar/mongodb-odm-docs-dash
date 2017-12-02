@@ -1,0 +1,912 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Aggregation builder &mdash; Doctrine MongoDB ODM 1.1.5 documentation</title>
+    <link rel="stylesheet" href="../_static/bootstrap/css/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/layout.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/configurationblock.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.1.5',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/configurationblock.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/configurationblock.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/configurationblock.js"></script>
+    <script src="../_static/bootstrap/js/bootstrap.min.js"></script>
+
+    <script type="text/javascript">
+    <!--
+        $(document).ready(function() {
+            $("#versions").change(function() {
+                var docsUrl = $(this).val();
+                window.location.href = docsUrl;
+            });
+        });
+    -->
+    </script>
+    <link rel="shortcut icon" href="../_static/doctrine.ico"/>
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="top" title="Doctrine MongoDB ODM 1.1.5 documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div id="wrapper">
+      <div id="header">
+        <h1 id="h1title"></h1>
+        <div id="logo">
+          <a href="http://www.doctrine-project.org/">Doctrine - PHP Database Libraries</a>
+        </div>
+      </div>
+      <div id="nav" class="cls">
+        <div class="tl cls">
+          <ul>
+            <li><a target="_top" href="http://www.doctrine-project.org/">Home</a></li>
+            <li><a target="_top" href="http://www.doctrine-project.org/about.html">About</a></li>
+            <li><a target="_top" href="http://www.doctrine-project.org/projects.html">Projects</a></li>
+            <li><a target="_top" href="http://www.doctrine-project.org/contribute.html">Contribute</a></li>
+            <li><a target="_top" href="http://www.doctrine-project.org/community.html">Community</a></li>
+            <li><a target="_top" href="http://www.doctrine-project.org/archive.html">Blog</a></li>
+            <li><a target="_top" href="http://www.doctrine-project.org/jira">Development</a></li>
+          </ul>
+        </div>
+      </div>
+      <div id="content" class="cls">
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li><a href="/">Doctrine Homepage</a> &raquo;</li>
+        <li><a href="../index.html">Doctrine MongoDB ODM 1.1.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+        <div class="document">
+            <div class="documentwrapper">
+                <div class="bodywrapper">
+
+              <div class="body" >
+                
+  <div class="section" id="aggregation-builder">
+<h1>Aggregation builder<a class="headerlink" href="#aggregation-builder" title="Permalink to this headline">¶</a></h1>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This feature is introduced in version 1.2</p>
+</div>
+<p>The aggregation framework provides an easy way to process records and return
+computed results. The aggregation builder helps to build complex aggregation
+pipelines.</p>
+<div class="section" id="creating-an-aggregation-builder">
+<h2>Creating an Aggregation Builder<a class="headerlink" href="#creating-an-aggregation-builder" title="Permalink to this headline">¶</a></h2>
+<p>You can easily create a new <code class="docutils literal"><span class="pre">Aggregation\Builder</span></code> object with the
+<code class="docutils literal"><span class="pre">DocumentManager::createAggregationBuilder()</span></code> method:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="nv">$builder</span> <span class="o">=</span> <span class="nv">$dm</span><span class="o">-&gt;</span><span class="na">createAggregationBuilder</span><span class="p">(</span><span class="nx">\Documents\User</span><span class="o">::</span><span class="na">class</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The first argument indicates the document for which you want to create the
+builder.</p>
+<div class="section" id="adding-pipeline-stages">
+<h3>Adding pipeline stages<a class="headerlink" href="#adding-pipeline-stages" title="Permalink to this headline">¶</a></h3>
+<p>To add a pipeline stage to the builder, call the corresponding method on the
+builder object:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="nv">$builder</span> <span class="o">=</span> <span class="nv">$dm</span><span class="o">-&gt;</span><span class="na">createAggregationBuilder</span><span class="p">(</span><span class="nx">\Documents\Orders</span><span class="o">::</span><span class="na">class</span><span class="p">);</span>
+<span class="nv">$builder</span>
+    <span class="o">-&gt;</span><span class="na">match</span><span class="p">()</span>
+        <span class="o">-&gt;</span><span class="na">field</span><span class="p">(</span><span class="s1">&#39;purchaseDate&#39;</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">gte</span><span class="p">(</span><span class="nv">$from</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">lt</span><span class="p">(</span><span class="nv">$to</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">field</span><span class="p">(</span><span class="s1">&#39;user&#39;</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">references</span><span class="p">(</span><span class="nv">$user</span><span class="p">)</span>
+    <span class="o">-&gt;</span><span class="na">group</span><span class="p">()</span>
+        <span class="o">-&gt;</span><span class="na">field</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">expression</span><span class="p">(</span><span class="s1">&#39;$user&#39;</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">field</span><span class="p">(</span><span class="s1">&#39;numPurchases&#39;</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">field</span><span class="p">(</span><span class="s1">&#39;amount&#39;</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">sum</span><span class="p">(</span><span class="s1">&#39;$amount&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Just like the query builder, the aggregation builder takes care of converting
+<code class="docutils literal"><span class="pre">DateTime</span></code> objects into <code class="docutils literal"><span class="pre">MongoDate</span></code> objects.</p>
+</div>
+<div class="section" id="nesting-expressions">
+<h3>Nesting expressions<a class="headerlink" href="#nesting-expressions" title="Permalink to this headline">¶</a></h3>
+<p>You can create more complex aggregation stages by using the <code class="docutils literal"><span class="pre">expr()</span></code> method in
+the aggregation builder.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="nv">$builder</span> <span class="o">=</span> <span class="nv">$dm</span><span class="o">-&gt;</span><span class="na">createAggregationBuilder</span><span class="p">(</span><span class="nx">\Documents\Orders</span><span class="o">::</span><span class="na">class</span><span class="p">);</span>
+<span class="nv">$builder</span>
+    <span class="o">-&gt;</span><span class="na">match</span><span class="p">()</span>
+        <span class="o">-&gt;</span><span class="na">field</span><span class="p">(</span><span class="s1">&#39;purchaseDate&#39;</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">gte</span><span class="p">(</span><span class="nv">$from</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">lt</span><span class="p">(</span><span class="nv">$to</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">field</span><span class="p">(</span><span class="s1">&#39;user&#39;</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">references</span><span class="p">(</span><span class="nv">$user</span><span class="p">)</span>
+    <span class="o">-&gt;</span><span class="na">group</span><span class="p">()</span>
+        <span class="o">-&gt;</span><span class="na">field</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">expression</span><span class="p">(</span>
+            <span class="nv">$builder</span><span class="o">-&gt;</span><span class="na">expr</span><span class="p">()</span>
+                <span class="o">-&gt;</span><span class="na">field</span><span class="p">(</span><span class="s1">&#39;month&#39;</span><span class="p">)</span>
+                <span class="o">-&gt;</span><span class="na">month</span><span class="p">(</span><span class="s1">&#39;purchaseDate&#39;</span><span class="p">)</span>
+                <span class="o">-&gt;</span><span class="na">field</span><span class="p">(</span><span class="s1">&#39;year&#39;</span><span class="p">)</span>
+                <span class="o">-&gt;</span><span class="na">year</span><span class="p">(</span><span class="s1">&#39;purchaseDate&#39;</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">field</span><span class="p">(</span><span class="s1">&#39;numPurchases&#39;</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">field</span><span class="p">(</span><span class="s1">&#39;amount&#39;</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">sum</span><span class="p">(</span><span class="s1">&#39;$amount&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>This aggregation would group all purchases by their month and year by projecting
+those values into an embedded object for the <code class="docutils literal"><span class="pre">id</span></code> field. For example:</p>
+<div class="highlight-json"><div class="highlight"><pre>{
+    _id: {
+        month: 1,
+        year: 2016
+    },
+    numPurchases: 1,
+    amount: 27.89
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="executing-an-aggregation-pipeline">
+<h3>Executing an aggregation pipeline<a class="headerlink" href="#executing-an-aggregation-pipeline" title="Permalink to this headline">¶</a></h3>
+<p>You can execute a pipeline using the <code class="docutils literal"><span class="pre">execute()</span></code> method. This will run the
+aggregation pipeline and return a cursor for you to iterate over the results:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="nv">$builder</span> <span class="o">=</span> <span class="nv">$dm</span><span class="o">-&gt;</span><span class="na">createAggregationBuilder</span><span class="p">(</span><span class="nx">\Documents\User</span><span class="o">::</span><span class="na">class</span><span class="p">);</span>
+<span class="nv">$result</span> <span class="o">=</span> <span class="nv">$builder</span><span class="o">-&gt;</span><span class="na">execute</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>If you instead want to look at the built aggregation pipeline, call the
+<code class="docutils literal"><span class="pre">Builder::getPipeline()</span></code> method.</p>
+</div>
+<div class="section" id="hydration">
+<h3>Hydration<a class="headerlink" href="#hydration" title="Permalink to this headline">¶</a></h3>
+<p>By default, aggregation results are returned as PHP arrays. This is because the
+result of an aggregation pipeline may look completely different from the source
+document. In order to get hydrated aggregation results, you first have to map
+a <code class="docutils literal"><span class="pre">QueryResultDocument</span></code>. These are written like regular mapped documents, but
+they can't be persisted to the database.</p>
+<div class="configuration-block">
+<ul class="simple">
+<li><em>PHP</em><div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">namespace</span> <span class="nx">Documents</span><span class="p">;</span>
+
+<span class="sd">/** @QueryResultDocument */</span>
+<span class="k">class</span> <span class="nc">UserPurchases</span>
+<span class="p">{</span>
+    <span class="sd">/** @ReferenceOne(targetDocument=&quot;User&quot;, name=&quot;_id&quot;) */</span>
+    <span class="k">private</span> <span class="nv">$user</span><span class="p">;</span>
+
+    <span class="sd">/** @Field(type=&quot;int&quot;) */</span>
+    <span class="k">private</span> <span class="nv">$numPurchases</span><span class="p">;</span>
+
+    <span class="sd">/** @Field(type=&quot;float&quot;) */</span>
+    <span class="k">private</span> <span class="nv">$amount</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><em>XML</em><div class="highlight-xml"><div class="highlight"><pre><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+<span class="nt">&lt;doctrine-mongo-mapping</span> <span class="na">xmlns=</span><span class="s">&quot;http://doctrine-project.org/schemas/odm/doctrine-mongo-mapping&quot;</span>
+                  <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+                  <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://doctrine-project.org/schemas/odm/doctrine-mongo-mapping</span>
+<span class="s">                  http://doctrine-project.org/schemas/odm/doctrine-mongo-mapping.xsd&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;query-result-document</span> <span class="na">name=</span><span class="s">&quot;Documents\UserPurchases&quot;</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;field</span> <span class="na">fieldName=</span><span class="s">&quot;numPurchases&quot;</span> <span class="na">type=</span><span class="s">&quot;int&quot;</span> <span class="nt">/&gt;</span>
+        <span class="nt">&lt;field</span> <span class="na">fieldName=</span><span class="s">&quot;amount&quot;</span> <span class="na">type=</span><span class="s">&quot;float&quot;</span> <span class="nt">/&gt;</span>
+        <span class="nt">&lt;reference-one</span> <span class="na">field=</span><span class="s">&quot;user&quot;</span> <span class="na">target-document=</span><span class="s">&quot;Documents\User&quot;</span> <span class="na">name=</span><span class="s">&quot;_id&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;/query-result-document&gt;</span>
+<span class="nt">&lt;/doctrine-mongo-mapping&gt;</span>
+</pre></div>
+</div>
+</li>
+<li><em>YAML</em><div class="highlight-yaml"><div class="highlight"><pre><span class="l l-Scalar l-Scalar-Plain">Documents\User</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">queryResultDocument</span>
+  <span class="l l-Scalar l-Scalar-Plain">fields</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">user</span><span class="p p-Indicator">:</span>
+      <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">_id</span>
+      <span class="l l-Scalar l-Scalar-Plain">targetDocument</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">Documents\User</span>
+    <span class="l l-Scalar l-Scalar-Plain">numPurchases</span><span class="p p-Indicator">:</span>
+      <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">int</span>
+    <span class="l l-Scalar l-Scalar-Plain">amount</span><span class="p p-Indicator">:</span>
+      <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">float</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<p>Once you have mapped the document, use the <code class="docutils literal"><span class="pre">hydrate()</span></code> method to tell the
+aggregation builder about this document:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="nv">$builder</span> <span class="o">=</span> <span class="nv">$dm</span><span class="o">-&gt;</span><span class="na">createAggregationBuilder</span><span class="p">(</span><span class="nx">\Documents\Orders</span><span class="o">::</span><span class="na">class</span><span class="p">);</span>
+<span class="nv">$builder</span>
+    <span class="o">-&gt;</span><span class="na">hydrate</span><span class="p">(</span><span class="nx">\Documents\UserPurchases</span><span class="o">::</span><span class="na">class</span><span class="p">)</span>
+    <span class="o">-&gt;</span><span class="na">match</span><span class="p">()</span>
+        <span class="o">-&gt;</span><span class="na">field</span><span class="p">(</span><span class="s1">&#39;purchaseDate&#39;</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">gte</span><span class="p">(</span><span class="nv">$from</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">lt</span><span class="p">(</span><span class="nv">$to</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">field</span><span class="p">(</span><span class="s1">&#39;user&#39;</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">references</span><span class="p">(</span><span class="nv">$user</span><span class="p">)</span>
+    <span class="o">-&gt;</span><span class="na">group</span><span class="p">()</span>
+        <span class="o">-&gt;</span><span class="na">field</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">expression</span><span class="p">(</span><span class="s1">&#39;$user&#39;</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">field</span><span class="p">(</span><span class="s1">&#39;numPurchases&#39;</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">field</span><span class="p">(</span><span class="s1">&#39;amount&#39;</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">sum</span><span class="p">(</span><span class="s1">&#39;$amount&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>When you run the queries, all results will be returned as instances of the
+specified document.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Query result documents can use all features regular documents can use: you
+can map embedded documents, define references, and even use discriminators
+to get different result documents according to the aggregation result.</p>
+</div>
+</div>
+</div>
+<div class="section" id="aggregation-pipeline-stages">
+<h2>Aggregation pipeline stages<a class="headerlink" href="#aggregation-pipeline-stages" title="Permalink to this headline">¶</a></h2>
+<p>MongoDB provides the following aggregation pipeline stages:</p>
+<ul class="simple">
+<li><a class="reference external" href="https://docs.mongodb.com/manual/reference/operator/aggregation/addFields/">$addFields</a></li>
+<li><a class="reference external" href="https://docs.mongodb.com/manual/reference/operator/aggregation/bucket/">$bucket</a></li>
+<li><a class="reference external" href="https://docs.mongodb.com/manual/reference/operator/aggregation/bucketAuto/">$bucketAuto</a></li>
+<li><a class="reference external" href="https://docs.mongodb.com/manual/reference/operator/aggregation/collStats/">$collStats</a></li>
+<li><a class="reference external" href="https://docs.mongodb.com/manual/reference/operator/aggregation/count/">$count</a></li>
+<li><a class="reference external" href="https://docs.mongodb.com/manual/reference/operator/aggregation/facet/">$facet</a></li>
+<li><a class="reference external" href="https://docs.mongodb.com/manual/reference/operator/aggregation/geoNear/">$geoNear</a></li>
+<li><a class="reference external" href="https://docs.mongodb.com/manual/reference/operator/aggregation/graphLookup/">$graphLookup</a></li>
+<li><a class="reference external" href="https://docs.mongodb.com/manual/reference/operator/aggregation/group/">$group</a></li>
+<li><a class="reference external" href="https://docs.mongodb.com/manual/reference/operator/aggregation/indexStats/">$indexStats</a></li>
+<li><a class="reference external" href="https://docs.mongodb.com/manual/reference/operator/aggregation/limit/">$limit</a></li>
+<li><a class="reference external" href="https://docs.mongodb.com/manual/reference/operator/aggregation/lookup/">$lookup</a></li>
+<li><a class="reference external" href="https://docs.mongodb.com/manual/reference/operator/aggregation/match/">$match</a></li>
+<li><a class="reference external" href="https://docs.mongodb.com/manual/reference/operator/aggregation/out/">$out</a></li>
+<li><a class="reference external" href="https://docs.mongodb.com/manual/reference/operator/aggregation/project/">$project</a></li>
+<li><a class="reference external" href="https://docs.mongodb.com/manual/reference/operator/aggregation/redact/">$redact</a></li>
+<li><a class="reference external" href="https://docs.mongodb.com/manual/reference/operator/aggregation/replaceRoot/">$replaceRoot</a></li>
+<li><a class="reference external" href="https://docs.mongodb.com/manual/reference/operator/aggregation/sample/">$sample</a></li>
+<li><a class="reference external" href="https://docs.mongodb.com/manual/reference/operator/aggregation/skip/">$skip</a></li>
+<li><a class="reference external" href="https://docs.mongodb.com/manual/reference/operator/aggregation/project/">$sort</a></li>
+<li><a class="reference external" href="https://docs.mongodb.com/manual/reference/operator/aggregation/sortByCount/">$sortByCount</a></li>
+<li><a class="reference external" href="https://docs.mongodb.com/manual/reference/operator/aggregation/unwind/">$unwind</a></li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <code class="docutils literal"><span class="pre">$lookup</span></code>, <code class="docutils literal"><span class="pre">$sample</span></code> and <code class="docutils literal"><span class="pre">$indexStats</span></code> stages were added in MongoDB
+3.2. The <code class="docutils literal"><span class="pre">$addFields</span></code>, <code class="docutils literal"><span class="pre">$bucket</span></code>, <code class="docutils literal"><span class="pre">$bucketAuto</span></code>, <code class="docutils literal"><span class="pre">$sortByCount</span></code>,
+<code class="docutils literal"><span class="pre">$replaceRoot</span></code>, <code class="docutils literal"><span class="pre">$facet</span></code>, <code class="docutils literal"><span class="pre">$graphLookup</span></code>, <code class="docutils literal"><span class="pre">$coun</span></code> and <code class="docutils literal"><span class="pre">$collStats</span></code>
+stages were added in MongoDB 3.4.</p>
+</div>
+<div class="section" id="id1">
+<h3>$addFields<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>Adds new fields to documents. <code class="docutils literal"><span class="pre">$addFields</span></code> outputs documents that contain all
+existing fields from the input documents and newly added fields.</p>
+<p>The <code class="docutils literal"><span class="pre">$addFields</span></code> stage is equivalent to a <code class="docutils literal"><span class="pre">$project</span></code> stage that explicitly
+specifies all existing fields in the input documents and adds the new fields.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="nv">$builder</span> <span class="o">=</span> <span class="nv">$dm</span><span class="o">-&gt;</span><span class="na">createAggregationBuilder</span><span class="p">(</span><span class="nx">\Documents\Orders</span><span class="o">::</span><span class="na">class</span><span class="p">);</span>
+<span class="nv">$builder</span>
+    <span class="o">-&gt;</span><span class="na">addFields</span><span class="p">()</span>
+        <span class="o">-&gt;</span><span class="na">field</span><span class="p">(</span><span class="s1">&#39;purchaseYear&#39;</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">year</span><span class="p">(</span><span class="s1">&#39;$purchaseDate&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id2">
+<h3>$bucket<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<p>Categorizes incoming documents into groups, called buckets, based on a specified
+expression and bucket boundaries.</p>
+<p>Each bucket is represented as a document in the output. The document for each
+bucket contains an _id field, whose value specifies the inclusive lower bound of
+the bucket and a count field that contains the number of documents in the bucket.
+The count field is included by default when the output is not specified.</p>
+<p><code class="docutils literal"><span class="pre">$bucket</span></code> only produces output documents for buckets that contain at least one
+input document.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="nv">$builder</span> <span class="o">=</span> <span class="nv">$dm</span><span class="o">-&gt;</span><span class="na">createAggregationBuilder</span><span class="p">(</span><span class="nx">\Documents\Orders</span><span class="o">::</span><span class="na">class</span><span class="p">);</span>
+<span class="nv">$builder</span>
+    <span class="o">-&gt;</span><span class="na">bucket</span><span class="p">()</span>
+        <span class="o">-&gt;</span><span class="na">groupBy</span><span class="p">(</span><span class="s1">&#39;$itemCount&#39;</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">boundaries</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="s1">&#39;5+&#39;</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">defaultBucket</span><span class="p">(</span><span class="s1">&#39;5+&#39;</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">output</span><span class="p">()</span>
+            <span class="o">-&gt;</span><span class="na">field</span><span class="p">(</span><span class="s1">&#39;lowestValue&#39;</span><span class="p">)</span>
+            <span class="o">-&gt;</span><span class="na">min</span><span class="p">(</span><span class="s1">&#39;$value&#39;</span><span class="p">)</span>
+            <span class="o">-&gt;</span><span class="na">field</span><span class="p">(</span><span class="s1">&#39;highestValue&#39;</span><span class="p">)</span>
+            <span class="o">-&gt;</span><span class="na">max</span><span class="p">(</span><span class="s1">&#39;$value&#39;</span><span class="p">)</span>
+<span class="p">;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id3">
+<h3>$bucketAuto<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<p>Similar to <code class="docutils literal"><span class="pre">$bucket</span></code>, except that boundaries are automatically determined in
+an attempt to evenly distribute the documents into the specified number of
+buckets.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="nv">$builder</span> <span class="o">=</span> <span class="nv">$dm</span><span class="o">-&gt;</span><span class="na">createAggregationBuilder</span><span class="p">(</span><span class="nx">\Documents\Orders</span><span class="o">::</span><span class="na">class</span><span class="p">);</span>
+<span class="nv">$builder</span>
+    <span class="o">-&gt;</span><span class="na">bucketAuto</span><span class="p">()</span>
+        <span class="o">-&gt;</span><span class="na">groupBy</span><span class="p">(</span><span class="s1">&#39;$itemCount&#39;</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">buckets</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">output</span><span class="p">()</span>
+            <span class="o">-&gt;</span><span class="na">field</span><span class="p">(</span><span class="s1">&#39;lowestValue&#39;</span><span class="p">)</span>
+            <span class="o">-&gt;</span><span class="na">min</span><span class="p">(</span><span class="s1">&#39;$value&#39;</span><span class="p">)</span>
+            <span class="o">-&gt;</span><span class="na">field</span><span class="p">(</span><span class="s1">&#39;highestValue&#39;</span><span class="p">)</span>
+            <span class="o">-&gt;</span><span class="na">max</span><span class="p">(</span><span class="s1">&#39;$value&#39;</span><span class="p">)</span>
+<span class="p">;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id4">
+<h3>$collStats<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal"><span class="pre">$collStats</span></code> stage returns statistics regarding a collection or view.</p>
+</div>
+<div class="section" id="id5">
+<h3>$count<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<p>Returns a document that contains a count of the number of documents input to the
+stage.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="nv">$builder</span> <span class="o">=</span> <span class="nv">$dm</span><span class="o">-&gt;</span><span class="na">createAggregationBuilder</span><span class="p">(</span><span class="nx">\Documents\Orders</span><span class="o">::</span><span class="na">class</span><span class="p">);</span>
+<span class="nv">$builder</span>
+    <span class="o">-&gt;</span><span class="na">match</span><span class="p">()</span>
+        <span class="o">-&gt;</span><span class="na">field</span><span class="p">(</span><span class="s1">&#39;itemCount&#39;</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">eq</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="o">-&gt;</span><span class="na">count</span><span class="p">(</span><span class="s1">&#39;numSingleItemOrders&#39;</span><span class="p">)</span>
+<span class="p">;</span>
+</pre></div>
+</div>
+<p>The example above returns a single document with the <code class="docutils literal"><span class="pre">numSingleItemOrders</span></code>
+containing the number of orders found.</p>
+</div>
+<div class="section" id="id6">
+<h3>$facet<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<p>Processes multiple aggregation pipelines within a single stage on the same set
+of input documents. Each sub-pipeline has its own field in the output document
+where its results are stored as an array of documents.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="nv">$builder</span> <span class="o">=</span> <span class="nv">$dm</span><span class="o">-&gt;</span><span class="na">createAggregationBuilder</span><span class="p">(</span><span class="nx">\Documents\Orders</span><span class="o">::</span><span class="na">class</span><span class="p">);</span>
+<span class="nv">$builder</span>
+    <span class="o">-&gt;</span><span class="na">facet</span><span class="p">()</span>
+        <span class="o">-&gt;</span><span class="na">field</span><span class="p">(</span><span class="s1">&#39;groupedByItemCount&#39;</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">pipeline</span><span class="p">(</span>
+            <span class="nv">$dm</span><span class="o">-&gt;</span><span class="na">createAggregationBuilder</span><span class="p">(</span><span class="nx">\Documents\Orders</span><span class="o">::</span><span class="na">class</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">group</span><span class="p">()</span>
+                <span class="o">-&gt;</span><span class="na">field</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">)</span>
+                <span class="o">-&gt;</span><span class="na">expression</span><span class="p">(</span><span class="s1">&#39;$itemCount&#39;</span><span class="p">)</span>
+                <span class="o">-&gt;</span><span class="na">field</span><span class="p">(</span><span class="s1">&#39;lowestValue&#39;</span><span class="p">)</span>
+                <span class="o">-&gt;</span><span class="na">min</span><span class="p">(</span><span class="s1">&#39;$value&#39;</span><span class="p">)</span>
+                <span class="o">-&gt;</span><span class="na">field</span><span class="p">(</span><span class="s1">&#39;highestValue&#39;</span><span class="p">)</span>
+                <span class="o">-&gt;</span><span class="na">max</span><span class="p">(</span><span class="s1">&#39;$value&#39;</span><span class="p">)</span>
+                <span class="o">-&gt;</span><span class="na">field</span><span class="p">(</span><span class="s1">&#39;totalValue&#39;</span><span class="p">)</span>
+                <span class="o">-&gt;</span><span class="na">sum</span><span class="p">(</span><span class="s1">&#39;$value&#39;</span><span class="p">)</span>
+                <span class="o">-&gt;</span><span class="na">field</span><span class="p">(</span><span class="s1">&#39;averageValue&#39;</span><span class="p">)</span>
+                <span class="o">-&gt;</span><span class="na">avg</span><span class="p">(</span><span class="s1">&#39;$value&#39;</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">field</span><span class="p">(</span><span class="s1">&#39;groupedByYear&#39;</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">pipeline</span><span class="p">(</span>
+            <span class="nv">$dm</span><span class="o">-&gt;</span><span class="na">createAggregationBuilder</span><span class="p">(</span><span class="nx">\Documents\Orders</span><span class="o">::</span><span class="na">class</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">group</span><span class="p">()</span>
+                <span class="o">-&gt;</span><span class="na">field</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">)</span>
+                <span class="o">-&gt;</span><span class="na">year</span><span class="p">(</span><span class="s1">&#39;purchaseDate&#39;</span><span class="p">)</span>
+                <span class="o">-&gt;</span><span class="na">field</span><span class="p">(</span><span class="s1">&#39;lowestValue&#39;</span><span class="p">)</span>
+                <span class="o">-&gt;</span><span class="na">min</span><span class="p">(</span><span class="s1">&#39;$value&#39;</span><span class="p">)</span>
+                <span class="o">-&gt;</span><span class="na">field</span><span class="p">(</span><span class="s1">&#39;highestValue&#39;</span><span class="p">)</span>
+                <span class="o">-&gt;</span><span class="na">max</span><span class="p">(</span><span class="s1">&#39;$value&#39;</span><span class="p">)</span>
+                <span class="o">-&gt;</span><span class="na">field</span><span class="p">(</span><span class="s1">&#39;totalValue&#39;</span><span class="p">)</span>
+                <span class="o">-&gt;</span><span class="na">sum</span><span class="p">(</span><span class="s1">&#39;$value&#39;</span><span class="p">)</span>
+                <span class="o">-&gt;</span><span class="na">field</span><span class="p">(</span><span class="s1">&#39;averageValue&#39;</span><span class="p">)</span>
+                <span class="o">-&gt;</span><span class="na">avg</span><span class="p">(</span><span class="s1">&#39;$value&#39;</span><span class="p">)</span>
+        <span class="p">)</span>
+<span class="p">;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id7">
+<h3>$geoNear<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal"><span class="pre">$geoNear</span></code> stage finds and outputs documents in order of nearest to
+farthest from a specified point.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="nv">$builder</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">dm</span><span class="o">-&gt;</span><span class="na">createAggregationBuilder</span><span class="p">(</span><span class="nx">\Documents\City</span><span class="o">::</span><span class="na">class</span><span class="p">);</span>
+<span class="nv">$builder</span>
+    <span class="o">-&gt;</span><span class="na">geoNear</span><span class="p">(</span><span class="mi">120</span><span class="p">,</span> <span class="mi">40</span><span class="p">)</span>
+    <span class="o">-&gt;</span><span class="na">spherical</span><span class="p">(</span><span class="k">true</span><span class="p">)</span>
+    <span class="o">-&gt;</span><span class="na">distanceField</span><span class="p">(</span><span class="s1">&#39;distance&#39;</span><span class="p">)</span>
+    <span class="c1">// Convert radians to kilometers (use 3963.192 for miles)</span>
+    <span class="o">-&gt;</span><span class="na">distanceMultiplier</span><span class="p">(</span><span class="mf">6378.137</span><span class="p">);</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <code class="docutils literal"><span class="pre">$geoNear</span></code> stage must be the first stage in the pipeline and the
+collection must contain a single geospatial index. You must include the
+<code class="docutils literal"><span class="pre">distanceField</span></code> option for the stage to work.</p>
+</div>
+</div>
+<div class="section" id="id8">
+<h3>$graphLookup<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
+<p>Performs a recursive search on a collection, with options for restricting the
+search by recursion depth and query filter. The <code class="docutils literal"><span class="pre">$graphLookup</span></code> stage can be
+used to resolve association graphs and flatten them into a single list.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="nv">$builder</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">dm</span><span class="o">-&gt;</span><span class="na">createAggregationBuilder</span><span class="p">(</span><span class="nx">\Documents\Traveller</span><span class="o">::</span><span class="na">class</span><span class="p">);</span>
+<span class="nv">$builder</span>
+    <span class="o">-&gt;</span><span class="na">graphLookup</span><span class="p">(</span><span class="s1">&#39;nearestAirport&#39;</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">connectFromField</span><span class="p">(</span><span class="s1">&#39;connections&#39;</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">maxDepth</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">depthField</span><span class="p">(</span><span class="s1">&#39;numConnections&#39;</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">alias</span><span class="p">(</span><span class="s1">&#39;destinations&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The target document of the reference used in <code class="docutils literal"><span class="pre">connectFromField</span></code> must be
+the very same document. The aggregation builder will throw an exception if
+you try to resolve a different document.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Due to a limitation in MongoDB, the <code class="docutils literal"><span class="pre">$graphLookup</span></code> stage can not be used
+with references that are stored as DBRef. To use references in a
+<code class="docutils literal"><span class="pre">$graphLookup</span></code> stage, store the reference as ID or <code class="docutils literal"><span class="pre">ref</span></code>. This is
+explained in the <a class="reference internal" href="reference-mapping.html"><span class="doc">Reference mapping</span></a> chapter.</p>
+</div>
+</div>
+<div class="section" id="aggregation-builder-group">
+<span id="id9"></span><h3>$group<a class="headerlink" href="#aggregation-builder-group" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal"><span class="pre">$group</span></code> stage is used to do calculations based on previously matched
+documents:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="nv">$builder</span> <span class="o">=</span> <span class="nv">$dm</span><span class="o">-&gt;</span><span class="na">createAggregationBuilder</span><span class="p">(</span><span class="nx">\Documents\Orders</span><span class="o">::</span><span class="na">class</span><span class="p">);</span>
+<span class="nv">$builder</span>
+    <span class="o">-&gt;</span><span class="na">match</span><span class="p">()</span>
+        <span class="o">-&gt;</span><span class="na">field</span><span class="p">(</span><span class="s1">&#39;user&#39;</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">references</span><span class="p">(</span><span class="nv">$user</span><span class="p">)</span>
+    <span class="o">-&gt;</span><span class="na">group</span><span class="p">()</span>
+        <span class="o">-&gt;</span><span class="na">field</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">expression</span><span class="p">(</span>
+            <span class="nv">$builder</span><span class="o">-&gt;</span><span class="na">expr</span><span class="p">()</span>
+                <span class="o">-&gt;</span><span class="na">field</span><span class="p">(</span><span class="s1">&#39;month&#39;</span><span class="p">)</span>
+                <span class="o">-&gt;</span><span class="na">month</span><span class="p">(</span><span class="s1">&#39;purchaseDate&#39;</span><span class="p">)</span>
+                <span class="o">-&gt;</span><span class="na">field</span><span class="p">(</span><span class="s1">&#39;year&#39;</span><span class="p">)</span>
+                <span class="o">-&gt;</span><span class="na">year</span><span class="p">(</span><span class="s1">&#39;purchaseDate&#39;</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">field</span><span class="p">(</span><span class="s1">&#39;numPurchases&#39;</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">field</span><span class="p">(</span><span class="s1">&#39;amount&#39;</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">sum</span><span class="p">(</span><span class="s1">&#39;$amount&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id10">
+<h3>$indexStats<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal"><span class="pre">$indexStats</span></code> stage returns statistics regarding the use of each index for
+the collection. More information can be found in the <a class="reference external" href="https://docs.mongodb.com/manual/reference/operator/aggregation/indexStats/">official Documentation</a></p>
+</div>
+<div class="section" id="id11">
+<h3>$lookup<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <code class="docutils literal"><span class="pre">$lookup</span></code> stage was introduced in MongoDB 3.2. Using it on older servers
+will result in an error.</p>
+</div>
+<p>The <code class="docutils literal"><span class="pre">$lookup</span></code> stage is used to fetch documents from different collections in
+pipeline stages. Take the following relationship for example:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="sd">/**</span>
+<span class="sd"> * @ReferenceMany(</span>
+<span class="sd"> *     targetDocument=&quot;Documents\Item&quot;,</span>
+<span class="sd"> *     cascade=&quot;all&quot;,</span>
+<span class="sd"> *     storeAs=&quot;id&quot;</span>
+<span class="sd"> * )</span>
+<span class="sd"> */</span>
+<span class="k">private</span> <span class="nv">$items</span><span class="p">;</span>
+</pre></div>
+</div>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="nv">$builder</span> <span class="o">=</span> <span class="nv">$dm</span><span class="o">-&gt;</span><span class="na">createAggregationBuilder</span><span class="p">(</span><span class="nx">\Documents\Orders</span><span class="o">::</span><span class="na">class</span><span class="p">);</span>
+<span class="nv">$builder</span>
+    <span class="o">-&gt;</span><span class="na">lookup</span><span class="p">(</span><span class="s1">&#39;items&#39;</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">alias</span><span class="p">(</span><span class="s1">&#39;items&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The resulting array will contain all matched item documents in an array. This has
+to be considered when looking up one-to-one relationships:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="sd">/**</span>
+<span class="sd"> * @ReferenceOne(</span>
+<span class="sd"> *     targetDocument=&quot;Documents\Item&quot;,</span>
+<span class="sd"> *     cascade=&quot;all&quot;,</span>
+<span class="sd"> *     storeAs=&quot;id&quot;</span>
+<span class="sd"> * )</span>
+<span class="sd"> */</span>
+<span class="k">private</span> <span class="nv">$items</span><span class="p">;</span>
+</pre></div>
+</div>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="nv">$builder</span> <span class="o">=</span> <span class="nv">$dm</span><span class="o">-&gt;</span><span class="na">createAggregationBuilder</span><span class="p">(</span><span class="nx">\Documents\Orders</span><span class="o">::</span><span class="na">class</span><span class="p">);</span>
+<span class="nv">$builder</span>
+    <span class="o">-&gt;</span><span class="na">lookup</span><span class="p">(</span><span class="s1">&#39;user&#39;</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">alias</span><span class="p">(</span><span class="s1">&#39;user&#39;</span><span class="p">)</span>
+    <span class="o">-&gt;</span><span class="na">unwind</span><span class="p">(</span><span class="s1">&#39;$user&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>MongoDB will always return an array, even if the lookup only returned a single
+document. Thus, when looking up one-to-one references the result must be flattened
+using the <code class="docutils literal"><span class="pre">$unwind</span></code> operator.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Due to a limitation in MongoDB, the <code class="docutils literal"><span class="pre">$lookup</span></code> stage can not be used with
+references that are stored as DBRef. To use references in a <code class="docutils literal"><span class="pre">$lookup</span></code>
+stage, store the reference as ID or <code class="docutils literal"><span class="pre">ref</span></code>. This is explained in the
+<a class="reference internal" href="reference-mapping.html"><span class="doc">Reference mapping</span></a> chapter.</p>
+</div>
+<p>You can also configure your lookup manually if you don't have it mapped in your
+document:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="nv">$builder</span> <span class="o">=</span> <span class="nv">$dm</span><span class="o">-&gt;</span><span class="na">createAggregationBuilder</span><span class="p">(</span><span class="nx">\Documents\Orders</span><span class="o">::</span><span class="na">class</span><span class="p">);</span>
+<span class="nv">$builder</span>
+    <span class="o">-&gt;</span><span class="na">lookup</span><span class="p">(</span><span class="s1">&#39;unmappedCollection&#39;</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">localField</span><span class="p">(</span><span class="s1">&#39;_id&#39;</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">foreignField</span><span class="p">(</span><span class="s1">&#39;userId&#39;</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">alias</span><span class="p">(</span><span class="s1">&#39;items&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id12">
+<h3>$match<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal"><span class="pre">$match</span></code> stage lets you filter documents according to certain criteria. It
+works just like the query builder:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="nv">$builder</span> <span class="o">=</span> <span class="nv">$dm</span><span class="o">-&gt;</span><span class="na">createAggregationBuilder</span><span class="p">(</span><span class="nx">\Documents\Orders</span><span class="o">::</span><span class="na">class</span><span class="p">);</span>
+<span class="nv">$builder</span>
+    <span class="o">-&gt;</span><span class="na">match</span><span class="p">()</span>
+        <span class="o">-&gt;</span><span class="na">field</span><span class="p">(</span><span class="s1">&#39;purchaseDate&#39;</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">gte</span><span class="p">(</span><span class="nv">$from</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">lt</span><span class="p">(</span><span class="nv">$to</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">field</span><span class="p">(</span><span class="s1">&#39;user&#39;</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">references</span><span class="p">(</span><span class="nv">$user</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>You can also use fields defined in previous stages:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="nv">$builder</span> <span class="o">=</span> <span class="nv">$dm</span><span class="o">-&gt;</span><span class="na">createAggregationBuilder</span><span class="p">(</span><span class="nx">\Documents\Orders</span><span class="o">::</span><span class="na">class</span><span class="p">);</span>
+<span class="nv">$builder</span>
+    <span class="o">-&gt;</span><span class="na">project</span><span class="p">()</span>
+        <span class="o">-&gt;</span><span class="na">excludeIdField</span><span class="p">()</span>
+        <span class="o">-&gt;</span><span class="na">includeFields</span><span class="p">([</span><span class="s1">&#39;purchaseDate&#39;</span><span class="p">,</span> <span class="s1">&#39;user&#39;</span><span class="p">])</span>
+        <span class="o">-&gt;</span><span class="na">field</span><span class="p">(</span><span class="s1">&#39;purchaseYear&#39;</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">year</span><span class="p">(</span><span class="s1">&#39;$purchaseDate&#39;</span><span class="p">)</span>
+    <span class="o">-&gt;</span><span class="na">match</span><span class="p">()</span>
+        <span class="o">-&gt;</span><span class="na">field</span><span class="p">(</span><span class="s1">&#39;purchaseYear&#39;</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">equals</span><span class="p">(</span><span class="mi">2016</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id13">
+<h3>$out<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal"><span class="pre">$out</span></code> stage is used to store the result of the aggregation pipeline in a
+collection instead of returning an iterable cursor of results. This must be the
+last stage in an aggregation pipeline.</p>
+<p>If the collection specified by the <code class="docutils literal"><span class="pre">$out</span></code> operation already exists, then upon
+completion of the aggregation, the existing collection is atomically replaced.
+Any indexes that existed on the collection are left intact. If the aggregation
+fails, the <code class="docutils literal"><span class="pre">$out</span></code> operation does not remove the data from an existing
+collection.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The aggregation pipeline will fail to complete if the result would violate
+any unique index constraints, including those on the <code class="docutils literal"><span class="pre">id</span></code> field.</p>
+</div>
+</div>
+<div class="section" id="id14">
+<h3>$project<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal"><span class="pre">$project</span></code> stage lets you reshape the current document or define a completely
+new one:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="nv">$builder</span> <span class="o">=</span> <span class="nv">$dm</span><span class="o">-&gt;</span><span class="na">createAggregationBuilder</span><span class="p">(</span><span class="nx">\Documents\Orders</span><span class="o">::</span><span class="na">class</span><span class="p">);</span>
+<span class="nv">$builder</span>
+    <span class="o">-&gt;</span><span class="na">project</span><span class="p">()</span>
+        <span class="o">-&gt;</span><span class="na">excludeIdField</span><span class="p">()</span>
+        <span class="o">-&gt;</span><span class="na">includeFields</span><span class="p">([</span><span class="s1">&#39;purchaseDate&#39;</span><span class="p">,</span> <span class="s1">&#39;user&#39;</span><span class="p">])</span>
+        <span class="o">-&gt;</span><span class="na">field</span><span class="p">(</span><span class="s1">&#39;purchaseYear&#39;</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">year</span><span class="p">(</span><span class="s1">&#39;$purchaseDate&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id15">
+<h3>$redact<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h3>
+<p>The redact stage can be used to restrict the contents of the documents based on
+information stored in the documents themselves. You can read more about the
+<code class="docutils literal"><span class="pre">$redact</span></code> stage in the <a class="reference external" href="https://docs.mongodb.com/manual/reference/operator/aggregation/redact/">MongoDB documentation</a>.</p>
+<p>The following example taken from the official documentation checks the <code class="docutils literal"><span class="pre">level</span></code>
+field on all document levels and evaluates it to grant or deny access:</p>
+<div class="highlight-json"><div class="highlight"><pre>{
+    _id: 1,
+    level: 1,
+    acct_id: &quot;xyz123&quot;,
+    cc: {
+        level: 5,
+        type: &quot;yy&quot;,
+        num: 000000000000,
+        exp_date: ISODate(&quot;2015-11-01T00:00:00.000Z&quot;),
+        billing_addr: {
+            level: 5,
+            addr1: &quot;123 ABC Street&quot;,
+            city: &quot;Some City&quot;
+        },
+        shipping_addr: [
+            {
+                level: 3,
+                addr1: &quot;987 XYZ Ave&quot;,
+                city: &quot;Some City&quot;
+            },
+            {
+                level: 3,
+                addr1: &quot;PO Box 0123&quot;,
+                city: &quot;Some City&quot;
+            }
+        ]
+    },
+    status: &quot;A&quot;
+}
+</pre></div>
+</div>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="nv">$builder</span> <span class="o">=</span> <span class="nv">$dm</span><span class="o">-&gt;</span><span class="na">createAggregationBuilder</span><span class="p">(</span><span class="nx">\Documents\Orders</span><span class="o">::</span><span class="na">class</span><span class="p">);</span>
+<span class="nv">$builder</span>
+    <span class="o">-&gt;</span><span class="na">redact</span><span class="p">()</span>
+        <span class="o">-&gt;</span><span class="na">cond</span><span class="p">(</span>
+            <span class="nv">$builder</span><span class="o">-&gt;</span><span class="na">expr</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">gte</span><span class="p">(</span><span class="s1">&#39;$$level&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
+            <span class="s1">&#39;$$PRUNE&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;$$DESCEND&#39;</span>
+        <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id16">
+<h3>$replaceRoot<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h3>
+<p>Promotes a specified document to the top level and replaces all other fields.
+The operation replaces all existing fields in the input document, including the
+<code class="docutils literal"><span class="pre">_id</span></code> field. You can promote an existing embedded document to the top level,
+or create a new document for promotion.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="nv">$builder</span> <span class="o">=</span> <span class="nv">$dm</span><span class="o">-&gt;</span><span class="na">createAggregationBuilder</span><span class="p">(</span><span class="nx">\Documents\Orders</span><span class="o">::</span><span class="na">class</span><span class="p">);</span>
+<span class="nv">$builder</span>
+    <span class="o">-&gt;</span><span class="na">replaceRoot</span><span class="p">(</span><span class="s1">&#39;$embeddedField&#39;</span><span class="p">);</span>
+
+<span class="nv">$builder</span> <span class="o">=</span> <span class="nv">$dm</span><span class="o">-&gt;</span><span class="na">createAggregationBuilder</span><span class="p">(</span><span class="nx">\Documents\Orders</span><span class="o">::</span><span class="na">class</span><span class="p">);</span>
+<span class="nv">$builder</span>
+    <span class="o">-&gt;</span><span class="na">replaceRoot</span><span class="p">()</span>
+        <span class="o">-&gt;</span><span class="na">field</span><span class="p">(</span><span class="s1">&#39;averagePricePerItem&#39;</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">divide</span><span class="p">(</span><span class="s1">&#39;$value&#39;</span><span class="p">,</span> <span class="s1">&#39;$itemCount&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id17">
+<h3>$sample<a class="headerlink" href="#id17" title="Permalink to this headline">¶</a></h3>
+<p>The sample stage can be used to randomly select a subset of documents in the
+aggregation pipeline. It behaves like the <code class="docutils literal"><span class="pre">$limit</span></code> stage, but instead of
+returning the first <code class="docutils literal"><span class="pre">n</span></code> documents it returns <code class="docutils literal"><span class="pre">n</span></code> random documents.</p>
+</div>
+<div class="section" id="sort-limit-and-skip">
+<h3>$sort, $limit and $skip<a class="headerlink" href="#sort-limit-and-skip" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal"><span class="pre">$sort</span></code>, <code class="docutils literal"><span class="pre">$limit</span></code> and <code class="docutils literal"><span class="pre">$skip</span></code> stages behave like the corresponding
+query options, allowing you to control the order and subset of results returned
+by the aggregation pipeline.</p>
+</div>
+<div class="section" id="id18">
+<h3>$sortByCount<a class="headerlink" href="#id18" title="Permalink to this headline">¶</a></h3>
+<p>Groups incoming documents based on the value of a specified expression, then
+computes the count of documents in each distinct group.</p>
+<p>Each output document contains two fields: an _id field containing the distinct
+grouping value, and a count field containing the number of documents belonging
+to that grouping or category.</p>
+<p>The documents are sorted by count in descending order.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="nv">$builder</span> <span class="o">=</span> <span class="nv">$dm</span><span class="o">-&gt;</span><span class="na">createAggregationBuilder</span><span class="p">(</span><span class="nx">\Documents\Orders</span><span class="o">::</span><span class="na">class</span><span class="p">);</span>
+<span class="nv">$builder</span><span class="o">-&gt;</span><span class="na">sortByCount</span><span class="p">(</span><span class="s1">&#39;$items&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The example above is equivalent to the following pipeline:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="nv">$builder</span> <span class="o">=</span> <span class="nv">$dm</span><span class="o">-&gt;</span><span class="na">createAggregationBuilder</span><span class="p">(</span><span class="nx">\Documents\Orders</span><span class="o">::</span><span class="na">class</span><span class="p">);</span>
+<span class="nv">$builder</span>
+    <span class="o">-&gt;</span><span class="na">group</span><span class="p">()</span>
+        <span class="o">-&gt;</span><span class="na">field</span><span class="p">(</span><span class="s1">&#39;_id&#39;</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">expression</span><span class="p">(</span><span class="s1">&#39;$items&#39;</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">field</span><span class="p">(</span><span class="s1">&#39;count&#39;</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="o">-&gt;</span><span class="na">sort</span><span class="p">([</span><span class="s1">&#39;count&#39;</span> <span class="o">=&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+<span class="p">;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id19">
+<h3>$unwind<a class="headerlink" href="#id19" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal"><span class="pre">$unwind</span></code> stage flattens an array in a document, returning a copy for each
+item. Take this sample document:</p>
+<div class="highlight-json"><div class="highlight"><pre>{
+    _id: {
+        month: 1,
+        year: 2016
+    },
+    purchaseDates: [
+        &#39;2016-01-07&#39;,
+        &#39;2016-03-10&#39;,
+        &#39;2016-06-25&#39;
+    ]
+}
+</pre></div>
+</div>
+<p>To flatten the <code class="docutils literal"><span class="pre">purchaseDates</span></code> array, we would apply the following pipeline
+stage:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="nv">$builder</span> <span class="o">=</span> <span class="nv">$dm</span><span class="o">-&gt;</span><span class="na">createAggregationBuilder</span><span class="p">(</span><span class="nx">\Documents\User</span><span class="o">::</span><span class="na">class</span><span class="p">);</span>
+<span class="nv">$builder</span><span class="o">-&gt;</span><span class="na">unwind</span><span class="p">(</span><span class="s1">&#39;$purchaseDates&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The stage would return three documents, each containing a single purchase date:</p>
+<div class="highlight-json"><div class="highlight"><pre>{
+    _id: {
+        month: 1,
+        year: 2016
+    },
+    purchaseDates: &#39;2016-01-07&#39;
+},
+{
+    _id: {
+        month: 1,
+        year: 2016
+    },
+    purchaseDates: &#39;2016-03-10&#39;
+},
+{
+    _id: {
+        month: 1,
+        year: 2016
+    },
+    purchaseDates: &#39;2016-06-25&#39;
+}
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+              </div>
+                </div>
+
+            </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+             
+            <div id="searchbox" style="">
+              <h3>Search</h3>
+                <form class="search" action="http://readthedocs.org/search/project/" method="get">
+                  <input type="text" name="q" size="18">
+                  <input type="submit" value="Go">
+                  <input type="hidden" name="selected_facets" value="project:">
+                </form>
+            </div>
+            <h3><a href="../index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference internal" href="#">Aggregation builder</a><ul>
+<li><a class="reference internal" href="#creating-an-aggregation-builder">Creating an Aggregation Builder</a><ul>
+<li><a class="reference internal" href="#adding-pipeline-stages">Adding pipeline stages</a></li>
+<li><a class="reference internal" href="#nesting-expressions">Nesting expressions</a></li>
+<li><a class="reference internal" href="#executing-an-aggregation-pipeline">Executing an aggregation pipeline</a></li>
+<li><a class="reference internal" href="#hydration">Hydration</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#aggregation-pipeline-stages">Aggregation pipeline stages</a><ul>
+<li><a class="reference internal" href="#id1">$addFields</a></li>
+<li><a class="reference internal" href="#id2">$bucket</a></li>
+<li><a class="reference internal" href="#id3">$bucketAuto</a></li>
+<li><a class="reference internal" href="#id4">$collStats</a></li>
+<li><a class="reference internal" href="#id5">$count</a></li>
+<li><a class="reference internal" href="#id6">$facet</a></li>
+<li><a class="reference internal" href="#id7">$geoNear</a></li>
+<li><a class="reference internal" href="#id8">$graphLookup</a></li>
+<li><a class="reference internal" href="#aggregation-builder-group">$group</a></li>
+<li><a class="reference internal" href="#id10">$indexStats</a></li>
+<li><a class="reference internal" href="#id11">$lookup</a></li>
+<li><a class="reference internal" href="#id12">$match</a></li>
+<li><a class="reference internal" href="#id13">$out</a></li>
+<li><a class="reference internal" href="#id14">$project</a></li>
+<li><a class="reference internal" href="#id15">$redact</a></li>
+<li><a class="reference internal" href="#id16">$replaceRoot</a></li>
+<li><a class="reference internal" href="#id17">$sample</a></li>
+<li><a class="reference internal" href="#sort-limit-and-skip">$sort, $limit and $skip</a></li>
+<li><a class="reference internal" href="#id18">$sortByCount</a></li>
+<li><a class="reference internal" href="#id19">$unwind</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../_sources/reference/aggregation-builder.rst.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+        </div>
+      </div>
+          <div class="clearer"></div>
+        </div>
+          <div class="footer">
+              &copy; Copyright 2013, Doctrine Project Team.
+              Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.6.2.
+            <br/>
+            <a target="_BLANK" href="http://www.servergrove.com"><img src="http://www.doctrine-project.org/_static/servergrove.jpg" /></a>      <br/><br/>
+            <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+              <input type="hidden" name="cmd" value="_s-xclick" />
+              <input type="hidden" name="hosted_button_id" value="BAE2E3XANQ77Y" />
+              <input type="image" src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!" />
+              <img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1" />
+            </form>
+          </div>
+      </div>
+
+      <div id="bot-rcnr">
+        <div class="tl"><!-- corner --></div>
+      </div>
+    </div>
+
+  <script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+  </script>
+  <script type="text/javascript">
+  _uacct = "UA-288343-7";
+  urchinTracker();
+  </script>
+  <a class="githublink" href="http://github.com/doctrine"><img src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png" alt="Fork me on GitHub"></a>
+  </body>
+</html>
